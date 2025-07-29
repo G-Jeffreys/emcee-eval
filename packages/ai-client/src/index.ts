@@ -265,3 +265,6 @@ export async function generateLLMResponse(
   const client = new LLMClient();
   return client.generate({ systemPrompt, conversationHistory, modelName });
 }
+
+// Export types
+export type { Message, LLMRequest, LLMResponse };
