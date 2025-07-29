@@ -40,3 +40,6 @@ yarn-error.log*
 .idea/
 
 packages/config/src/secret.ts
+
+# Project docs
+docs/
