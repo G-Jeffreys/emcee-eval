@@ -7,6 +7,8 @@
 import { battleDB } from '@repo/db';
 import { createOpenAIClientFromEnv, generateVersesFromDescription, type Genre } from '@repo/lyrics';
 import { createMurekaClientFromEnv, type SongGenerationResponse } from '@repo/mureka';
+import { generateBattlerResponse } from '@repo/ai-client';
+import { normalizeAIBattler } from '@repo/types';
 
 export interface BattleJobData {
   battleId: number;
@@ -244,32 +246,33 @@ class JobQueue {
       // Calculate order index (2 verses per round)
       const orderIdx = (round - 1) * 2 + (ai === battle.aiOne ? 1 : 2);
       
-      // Generate lyrics using OpenAI
-      const lyricsClient = createOpenAIClientFromEnv();
+      // Normalize AI name and generate lyrics using appropriate model
+      const normalizedAI = normalizeAIBattler(ai, `verse generation for battle ${battleId}`);
       
       // Create context for the AI persona
       const battleContext = `This is a rap battle between ${battle.aiOne} and ${battle.aiTwo}. 
-You are ${ai}. Write a fierce, clever rap verse that:
-- Showcases ${ai}'s personality and strengths
+You are ${normalizedAI}. Write a fierce, clever rap verse that:
+- Showcases ${normalizedAI}'s personality and strengths as an AI model
 - Responds to previous verses if any
 - Uses wordplay, metaphors, and rhymes
 - Is around 8-12 lines long
-- Maintains appropriate content (no explicit profanity)`;
+- Maintains appropriate content (no explicit profanity)
+- Write ONLY the rap lyrics, no labels or formatting`;
 
       const previousContext = previousVerses.length > 0 
         ? `\n\nPrevious verses in this battle:\n${previousVerses.join('\n---\n')}` 
         : '';
 
-      const lyrics = await generateVersesFromDescription(
-        lyricsClient,
-        battleContext + previousContext,
-        '',
-        'rap' as Genre,
-        {
-          verseCount: 1,
-          linesPerVerse: '8-12',
-        }
+      const fullPrompt = battleContext + previousContext;
+
+      const response = await generateBattlerResponse(
+        fullPrompt,
+        [], // No conversation history for rap battles
+        ai, // Use original AI name, will be normalized internally
+        `battle ${battleId} verse generation`
       );
+
+      const lyrics = response.content.trim();
 
       // Create verse record in database first
       const verse = await battleDB.createVerse({

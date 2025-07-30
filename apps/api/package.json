@@ -20,6 +20,7 @@
     "@repo/db": "workspace:*",
     "@repo/lyrics": "workspace:*",
     "@repo/mureka": "workspace:*",
+    "@repo/types": "workspace:*",
     "@trpc/server": "^11.4.3",
     "compression": "^1.7.5",
     "dotenv": "^16.0.0",

@@ -1,4 +1,4 @@
-import { Verse } from "./types.js";
+import { Verse } from "@repo/types";
 
 export const mockVerse: Omit<Verse, 'ai'> = {
         url: 'https://cdn.mureka.ai/cos-prod/open/song/20250729/78858497949697-5cUP1C7P8hzwQcQoBs9dZi.mp3',

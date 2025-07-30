@@ -35,6 +35,7 @@
     "@orpc/server": "^1.7.1",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@repo/types": "workspace:*",
     "@tailwindcss/vite": "4.0.0-alpha.32",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",

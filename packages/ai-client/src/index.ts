@@ -1,3 +1,5 @@
+import { AIBattler, normalizeAIBattler } from '@repo/types';
+
 interface Message {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -266,5 +268,42 @@ export async function generateLLMResponse(
   return client.generate({ systemPrompt, conversationHistory, modelName });
 }
 
+/**
+ * Get the default model name for an AI battler
+ * @param aiBattler - The AI battler type
+ * @returns The model name to use with the LLM client
+ */
+export function getModelForAIBattler(aiBattler: AIBattler): string {
+  const modelMap: Record<AIBattler, string> = {
+    'openai': 'gpt-4o',
+    'anthropic': 'claude-3-5-sonnet-20241022',
+    'gemini': 'gemini-2.0-flash-exp',
+    'grok': 'grok-4',
+  };
+  
+  return modelMap[aiBattler];
+}
+
+/**
+ * Generate LLM response using AI battler name (with validation)
+ * @param systemPrompt - The system prompt
+ * @param conversationHistory - The conversation history
+ * @param aiBattlerName - The AI battler name (will be normalized)
+ * @param context - Optional context for warning messages
+ * @returns LLM response
+ */
+export async function generateBattlerResponse(
+  systemPrompt: string,
+  conversationHistory: Message[],
+  aiBattlerName: string,
+  context?: string
+): Promise<LLMResponse> {
+  const normalizedBattler = normalizeAIBattler(aiBattlerName, context);
+  const modelName = getModelForAIBattler(normalizedBattler);
+  
+  const client = new LLMClient();
+  return client.generate({ systemPrompt, conversationHistory, modelName });
+}
+
 // Export types
-export type { Message, LLMRequest, LLMResponse };
+export type { Message, LLMRequest, LLMResponse, AIBattler };

@@ -48,6 +48,9 @@ export type BattleStatus = typeof battleStatuses[number];
 // Export Prisma types
 export type { Battle, Verse } from '@prisma/client';
 
+// Export constants
+export { DATABASE_URL } from './consts.js';
+
 // Create Prisma client
 export const prisma = new PrismaClient();
 

@@ -1,5 +1,5 @@
 import { mockVerse } from "./mockVerse.js";
-import { Battle } from "./types.js";
+import { Battle } from "@repo/types";
 
 // Mock battle data for frontend testing using real mureka-responses.json structure
 
