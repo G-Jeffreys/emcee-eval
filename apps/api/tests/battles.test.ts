@@ -73,8 +73,8 @@ describe("tRPC Battle API", () => {
       expect(battle.status).toBe("completed");
       expect(battle.ai_one).toBeDefined();
       expect(battle.ai_two).toBeDefined();
-      expect(battle.rounds).toBeDefined();
-      expect(Array.isArray(battle.rounds)).toBe(true);
+      expect(battle.verses).toBeDefined();
+      expect(Array.isArray(battle.verses)).toBe(true);
       expect(battle.winner).toBeDefined();
     });
 

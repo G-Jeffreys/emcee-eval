@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Battle {
+  id           Int      @id @default(autoincrement())
+  aiOne        String
+  aiTwo        String
+  status       String   @default("pending") // pending, generating, completed, failed
+  currentRound Int      @default(0)
+  totalRounds  Int      @default(4)
+  winner       String?  // null until battle completes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  verses       Verse[]
+  
+  @@map("battles")
+}
+
+model Verse {
+  id            Int      @id @default(autoincrement())
+  battleId      Int
+  orderIdx      Int      // 0-based chronological order
+  ai            String   // which AI rapper this verse belongs to
+  lyrics        String
+  audioUrl      String?  // nullable until audio is generated
+  lrcJson       String?  // timestamped lyrics as JSON string
+  murekaJobId   String?  // Mureka job ID for tracking audio generation
+  murekaStatus  String?  // Mureka job status: preparing, queued, running, succeeded, failed, etc.
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  battle        Battle   @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  
+  // Constraints
+  @@unique([battleId, orderIdx])
+  @@map("verses")
+}

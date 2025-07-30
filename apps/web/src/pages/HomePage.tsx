@@ -16,12 +16,26 @@ export function HomePage(): React.JSX.Element {
   const [aiTwo, setAiTwo] = useState("AlgoMC");
   const [battleId, setBattleId] = useState("");
   const [message, setMessage] = useState("");
+  
+  // Backend API state
+  const [backendAiOne, setBackendAiOne] = useState("BackendRapper");
+  const [backendAiTwo, setBackendAiTwo] = useState("APIFlow");
+  const [storedBattleId, setStoredBattleId] = useState("");
+  const [backendMessage, setBackendMessage] = useState("");
 
   const createBattle = trpc.battles.create.useMutation();
 
   const getBattle = trpc.battles.get.useQuery(
     { battle_id: battleId },
     { enabled: !!battleId.trim() }
+  );
+
+  // Backend API hooks
+  const createBackendBattle = trpc.battles.create.useMutation();
+  
+  const getStoredBattle = trpc.battles.get.useQuery(
+    { battle_id: storedBattleId },
+    { enabled: false } // Only fetch when manually triggered
   );
 
   const handleCreateBattle = () => {
@@ -64,6 +78,49 @@ export function HomePage(): React.JSX.Element {
     });
   };
 
+  // Backend API handlers
+  const handleCreateBackendBattle = () => {
+    if (!backendAiOne.trim() || !backendAiTwo.trim()) {
+      setBackendMessage("Please enter both AI rapper names");
+      return;
+    }
+    
+    const input = {
+      ai_one: backendAiOne.trim(),
+      ai_two: backendAiTwo.trim(),
+    };
+    
+    console.log("Creating backend battle with input:", input);
+    
+    createBackendBattle.mutate(input, {
+      onSuccess: (data) => {
+        const newBattleId = data.battle_id ?? '';
+        setStoredBattleId(newBattleId);
+        setBackendMessage(`Backend battle created! Stored ID: ${newBattleId}`);
+      },
+      onError: (error) => {
+        setBackendMessage(`Backend Error: ${error.message}`);
+        console.error("Backend battle creation error:", error);
+      },
+    });
+  };
+
+  const handleQueryStoredBattle = () => {
+    if (!storedBattleId.trim()) {
+      setBackendMessage("No battle ID stored. Create a backend battle first.");
+      return;
+    }
+    
+    getStoredBattle.refetch().then(() => {
+      if (getStoredBattle.data) {
+        console.log("Stored battle status:", getStoredBattle.data);
+        setBackendMessage(`Battle status: ${getStoredBattle.data.status || 'unknown'} - Check console for full details!`);
+      }
+    }).catch((error) => {
+      setBackendMessage(`Query Error: ${error.message}`);
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
@@ -80,6 +137,14 @@ export function HomePage(): React.JSX.Element {
           <Card className="mb-6">
             <CardContent className="pt-6">
               <p className="text-sm">{message}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {backendMessage && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="pt-6">
+              <p className="text-sm text-blue-800">{backendMessage}</p>
             </CardContent>
           </Card>
         )}
@@ -213,6 +278,63 @@ export function HomePage(): React.JSX.Element {
                 ✅ Completed Battle (battle-3)
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Backend API Testing</CardTitle>
+            <CardDescription>
+              Test the actual backend API - creates real battles and stores battle IDs
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="backend-ai-one">Backend AI Rapper 1</Label>
+                <Input
+                  id="backend-ai-one"
+                  value={backendAiOne}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBackendAiOne(e.target.value)}
+                  placeholder="Enter AI rapper name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="backend-ai-two">Backend AI Rapper 2</Label>
+                <Input
+                  id="backend-ai-two"
+                  value={backendAiTwo}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBackendAiTwo(e.target.value)}
+                  placeholder="Enter AI rapper name"
+                />
+              </div>
+            </div>
+            <Button 
+              onClick={handleCreateBackendBattle} 
+              disabled={createBackendBattle.isPending}
+              className="w-full"
+            >
+              {createBackendBattle.isPending ? "Creating Backend Battle..." : "Create Backend Battle"}
+            </Button>
+            
+            {storedBattleId && (
+              <div className="pt-4 border-t">
+                <div className="mb-3">
+                  <Label className="text-sm font-medium">Stored Battle ID:</Label>
+                  <p className="text-sm text-muted-foreground font-mono bg-muted p-2 rounded mt-1">
+                    {storedBattleId}
+                  </p>
+                </div>
+                <Button 
+                  onClick={handleQueryStoredBattle} 
+                  disabled={getStoredBattle.isFetching}
+                  className="w-full"
+                  variant="outline"
+                >
+                  {getStoredBattle.isFetching ? "Querying Status..." : "Query Battle Status"}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

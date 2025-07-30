@@ -10,23 +10,21 @@
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push"
   },
   "dependencies": {
-    "@repo/config": "workspace:*",
-    "drizzle-orm": "^0.36.4",
-    "pg": "^8.16.3",
+    "@prisma/client": "^6.0.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/pg": "^8.15.4",
-    "drizzle-kit": "^0.30.6",
-    "typescript": "^5.8.2"
+    "prisma": "^6.0.0",
+    "typescript": "^5.8.2",
+    "vitest": "^2.1.0"
   }
 }

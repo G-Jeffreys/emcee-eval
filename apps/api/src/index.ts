@@ -1,3 +1,8 @@
+// Load environment variables first
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '../../.env') });
+
 import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet";

@@ -1,13 +1,7 @@
 import { initTRPC } from '@trpc/server';
-import { db, users, insertUserSchema, updateUserSchema, eq } from '@repo/db';
+import { battleDB, insertBattleSchema } from '@repo/db';
 import { z } from 'zod';
-import { PendingBattle, GeneratingBattle, CompletedBattle } from '../data/mockBattles.js';
-
-const mockBattles: Record<string, typeof PendingBattle> = {
-  'battle-1': PendingBattle,
-  'battle-2': GeneratingBattle, 
-  'battle-3': CompletedBattle,
-}
+import { jobQueue } from '../jobs/queue.js';
 
 // Initialize tRPC
 const t = initTRPC.create();
@@ -16,96 +10,89 @@ const t = initTRPC.create();
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-// Define the user router
-export const userRouter = router({
-  list: publicProcedure
-    .query(async () => {
-      const allUsers = await db.select().from(users);
-      return allUsers;
-    }),
-
-  get: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      const [user] = await db.select().from(users).where(eq(users.id, input.id)).limit(1);
-      if (!user) {
-        throw new Error('User not found');
-      }
-      return user;
-    }),
-
-  create: publicProcedure
-    .input(insertUserSchema)
-    .mutation(async ({ input }) => {
-      const [newUser] = await db.insert(users).values(input).returning();
-      return newUser;
-    }),
-
-  update: publicProcedure
-    .input(z.object({
-      id: z.number(),
-      data: updateUserSchema,
-    }))
-    .mutation(async ({ input }) => {
-      const [updatedUser] = await db
-        .update(users)
-        .set({
-          ...input.data,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, input.id))
-        .returning();
-      if (!updatedUser) {
-        throw new Error('User not found');
-      }
-      return updatedUser;
-    }),
-
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const deletedUser = await db.delete(users).where(eq(users.id, input.id)).returning();
-      if (deletedUser.length === 0) {
-        throw new Error('User not found');
-      }
-      return { success: true };
-    }),
-});
-
-// Track current mock battle ID index
-let mockBattleIdIndex = 0;
-
 // Define the battle router
 export const battleRouter = router({
   create: publicProcedure
     .input(z.object({
-      ai_one: z.string().min(1),
-      ai_two: z.string().min(1)
+      ai_one: z.string().min(1).max(100),
+      ai_two: z.string().min(1).max(100),
+      total_rounds: z.number().min(1).max(1).optional().default(1)
     }))
     .mutation(async ({ input }) => {
-      // Return a mock battle ID without creating any data (this is just a stub)
-      const battleIds = Object.keys(mockBattles);
-      const battleId = battleIds[mockBattleIdIndex % battleIds.length];
-      mockBattleIdIndex++;
-      
-      return { battle_id: battleId };
+      console.log('🎤 Creating new battle:', {
+        aiOne: input.ai_one,
+        aiTwo: input.ai_two,
+        totalRounds: input.total_rounds,
+      });
+
+      // Create battle in database
+      const battle = await battleDB.createBattle({
+        aiOne: input.ai_one,
+        aiTwo: input.ai_two,
+        totalRounds: input.total_rounds,
+      });
+
+      console.log('✅ Battle created:', {
+        battleId: battle.id,
+        status: battle.status,
+      });
+
+      // Start background job to generate verses
+      await jobQueue.add('generateBattle', { battleId: battle.id });
+
+      return { 
+        battle_id: battle.id.toString(),
+        status: battle.status,
+        ai_one: battle.aiOne,
+        ai_two: battle.aiTwo,
+        current_round: battle.currentRound,
+        total_rounds: battle.totalRounds,
+      };
     }),
 
   get: publicProcedure
     .input(z.object({ battle_id: z.string() }))
     .query(async ({ input }) => {
-      const battle = mockBattles[input.battle_id];
-      if (!battle) {
+      const battleId = parseInt(input.battle_id, 10);
+      
+      if (isNaN(battleId)) {
+        throw new Error('Invalid battle ID');
+      }
+
+      console.log('🔍 Getting battle:', { battleId });
+
+      const battleWithVerses = await battleDB.getBattleWithVerses(battleId);
+
+      if (!battleWithVerses) {
         throw new Error('Battle not found');
       }
-      return battle;
-    }),
 
+      // Transform to match expected format
+      return {
+        battle_id: battleWithVerses.id.toString(),
+        ai_one: battleWithVerses.aiOne,
+        ai_two: battleWithVerses.aiTwo,
+        status: battleWithVerses.status,
+        current_round: battleWithVerses.currentRound,
+        total_rounds: battleWithVerses.totalRounds,
+        winner: battleWithVerses.winner,
+        created_at: battleWithVerses.createdAt.toISOString(),
+        updated_at: battleWithVerses.updatedAt.toISOString(),
+        verses: battleWithVerses.verses.map(verse => ({
+          id: verse.id,
+          order_idx: verse.orderIdx,
+          ai: verse.ai,
+          lyrics: verse.lyrics,
+          audio_url: verse.audioUrl,
+          lrc_json: verse.lrcJson ? JSON.parse(verse.lrcJson) : null,
+          created_at: verse.createdAt.toISOString(),
+        })),
+      };
+    }),
 });
 
 // Create the main app router
 export const appRouter = router({
-  users: userRouter,
   battles: battleRouter,
 });
 
