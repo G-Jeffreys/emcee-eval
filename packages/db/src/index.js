@@ -32,6 +32,8 @@ export const updateVerseSchema = z.object({
     murekaJobId: z.string().optional(),
     murekaStatus: z.string().optional(),
 });
+// Export constants
+export { DATABASE_URL } from './consts.js';
 // Create Prisma client
 export const prisma = new PrismaClient();
 // Database operations

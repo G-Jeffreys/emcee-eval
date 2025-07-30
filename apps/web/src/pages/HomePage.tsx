@@ -9,7 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { trpc } from "@/utils/trpc";
+import { AI_BATTLERS } from "@/types/battle";
 
 export function HomePage(): React.JSX.Element {
   const [aiOne, setAiOne] = useState("CodeRapper");
@@ -18,8 +26,8 @@ export function HomePage(): React.JSX.Element {
   const [message, setMessage] = useState("");
   
   // Backend API state
-  const [backendAiOne, setBackendAiOne] = useState("BackendRapper");
-  const [backendAiTwo, setBackendAiTwo] = useState("APIFlow");
+  const [backendAiOne, setBackendAiOne] = useState("openai");
+  const [backendAiTwo, setBackendAiTwo] = useState("anthropic");
   const [storedBattleId, setStoredBattleId] = useState("");
   const [backendMessage, setBackendMessage] = useState("");
 
@@ -283,30 +291,42 @@ export function HomePage(): React.JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Backend API Testing</CardTitle>
+            <CardTitle>🤖 AI Battler Selection</CardTitle>
             <CardDescription>
-              Test the actual backend API - creates real battles and stores battle IDs
+              Create battles using specific AI models - choose from grok, openai, gemini, or anthropic
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="backend-ai-one">Backend AI Rapper 1</Label>
-                <Input
-                  id="backend-ai-one"
-                  value={backendAiOne}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBackendAiOne(e.target.value)}
-                  placeholder="Enter AI rapper name"
-                />
+                <Label htmlFor="backend-ai-one">AI Battler 1</Label>
+                <Select value={backendAiOne} onValueChange={setBackendAiOne}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select AI battler" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AI_BATTLERS.map((battler) => (
+                      <SelectItem key={battler} value={battler}>
+                        {battler}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <Label htmlFor="backend-ai-two">Backend AI Rapper 2</Label>
-                <Input
-                  id="backend-ai-two"
-                  value={backendAiTwo}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBackendAiTwo(e.target.value)}
-                  placeholder="Enter AI rapper name"
-                />
+                <Label htmlFor="backend-ai-two">AI Battler 2</Label>
+                <Select value={backendAiTwo} onValueChange={setBackendAiTwo}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select AI battler" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AI_BATTLERS.map((battler) => (
+                      <SelectItem key={battler} value={battler}>
+                        {battler}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <Button 
@@ -314,7 +334,7 @@ export function HomePage(): React.JSX.Element {
               disabled={createBackendBattle.isPending}
               className="w-full"
             >
-              {createBackendBattle.isPending ? "Creating Backend Battle..." : "Create Backend Battle"}
+              {createBackendBattle.isPending ? "Creating AI Battle..." : "Create AI Battle"}
             </Button>
             
             {storedBattleId && (

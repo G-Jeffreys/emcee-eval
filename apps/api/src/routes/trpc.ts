@@ -16,7 +16,7 @@ export const battleRouter = router({
     .input(z.object({
       ai_one: z.string().min(1).max(100),
       ai_two: z.string().min(1).max(100),
-      total_rounds: z.number().min(1).max(1).optional().default(1)
+      total_rounds: z.number().min(1).max(2).optional().default(1)
     }))
     .mutation(async ({ input }) => {
       console.log('🎤 Creating new battle:', {

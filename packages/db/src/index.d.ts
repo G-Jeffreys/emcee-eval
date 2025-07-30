@@ -86,6 +86,7 @@ export type NewVerse = z.infer<typeof insertVerseSchema>;
 export type UpdateVerse = z.infer<typeof updateVerseSchema>;
 export type BattleStatus = typeof battleStatuses[number];
 export type { Battle, Verse } from '@prisma/client';
+export { DATABASE_URL } from './consts.js';
 export declare const prisma: PrismaClient<import("@prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;
 export declare const battleDB: {
     prisma: PrismaClient<import("@prisma/client").Prisma.PrismaClientOptions, never, import("@prisma/client/runtime/library").DefaultArgs>;

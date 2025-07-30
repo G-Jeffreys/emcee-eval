@@ -8,7 +8,7 @@ export const battleStatuses = ['pending', 'generating', 'completed', 'failed'] a
 export const insertBattleSchema = z.object({
   aiOne: z.string().min(1).max(100),
   aiTwo: z.string().min(1).max(100),
-  totalRounds: z.number().min(1).max(1).optional().default(1),
+  totalRounds: z.number().min(1).max(2).optional().default(1),
 });
 
 export const updateBattleSchema = z.object({

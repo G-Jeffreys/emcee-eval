@@ -67,7 +67,7 @@ describe('tRPC Battle API', () => {
       const invalidBattle = {
         ai_one: 'CodeRapper',
         ai_two: 'AlgoMC',
-        total_rounds: 1, // Too low
+        total_rounds: 0, // Too low
       };
 
       await expect(caller.battles.create(invalidBattle)).rejects.toThrow();
@@ -77,7 +77,7 @@ describe('tRPC Battle API', () => {
       const invalidBattle = {
         ai_one: 'CodeRapper',
         ai_two: 'AlgoMC',
-        total_rounds: 15, // Too high
+        total_rounds: 3, // Too high
       };
 
       await expect(caller.battles.create(invalidBattle)).rejects.toThrow();
