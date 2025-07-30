@@ -78,15 +78,14 @@ export const battleRouter = router({
         winner: battleWithVerses.winner,
         created_at: battleWithVerses.createdAt.toISOString(),
         updated_at: battleWithVerses.updatedAt.toISOString(),
-        verses: battleWithVerses.verses.map(verse => ({
-          id: verse.id,
-          order_idx: verse.orderIdx,
-          ai: verse.ai,
-          lyrics: verse.lyrics,
-          audio_url: verse.audioUrl,
-          lrc_json: verse.lrcJson ? JSON.parse(verse.lrcJson) : null,
-          created_at: verse.createdAt.toISOString(),
-        })),
+        verses: battleWithVerses.verses
+          .filter(verse => verse.audioUrl && verse.duration && verse.lrcJson) // Only include completed verses
+          .map(verse => ({
+            url: verse.audioUrl!,
+            ai: verse.ai,
+            duration: verse.duration!,
+            lyrics_sections: verse.lrcJson ? JSON.parse(verse.lrcJson) : [],
+          })),
       };
     }),
 });

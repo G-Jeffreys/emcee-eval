@@ -23,6 +23,7 @@ export const insertVerseSchema = z.object({
   ai: z.string().min(1),
   lyrics: z.string().min(1),
   audioUrl: z.string().url().optional(),
+  duration: z.number().optional(),
   lrcJson: z.string().optional(),
   murekaJobId: z.string().optional(),
   murekaStatus: z.string().optional(),
@@ -31,6 +32,7 @@ export const insertVerseSchema = z.object({
 export const updateVerseSchema = z.object({
   lyrics: z.string().optional(),
   audioUrl: z.string().url().optional(),
+  duration: z.number().optional(),
   lrcJson: z.string().optional(),
   murekaJobId: z.string().optional(),
   murekaStatus: z.string().optional(),
@@ -93,6 +95,7 @@ export const battleDB = {
         ai: data.ai,
         lyrics: data.lyrics,
         audioUrl: data.audioUrl || null,
+        duration: data.duration || null,
         lrcJson: data.lrcJson || null,
         murekaJobId: data.murekaJobId || null,
         murekaStatus: data.murekaStatus || null,
@@ -113,6 +116,7 @@ export const battleDB = {
       data: {
         ...(data.lyrics && { lyrics: data.lyrics }),
         ...(data.audioUrl !== undefined && { audioUrl: data.audioUrl }),
+        ...(data.duration !== undefined && { duration: data.duration }),
         ...(data.lrcJson !== undefined && { lrcJson: data.lrcJson }),
         ...(data.murekaJobId !== undefined && { murekaJobId: data.murekaJobId }),
         ...(data.murekaStatus !== undefined && { murekaStatus: data.murekaStatus }),

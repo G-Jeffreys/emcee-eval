@@ -113,12 +113,15 @@ describe('tRPC Battle API', () => {
     });
 
     it('should get battle with verses', async () => {
-      // Add some verses
+      // Add verses with complete data (only completed verses are returned)
       await battleDB.createVerse({
         battleId: parseInt(battleId, 10),
         orderIdx: 0,
         ai: 'TestBot',
         lyrics: 'First verse from TestBot',
+        audioUrl: 'https://example.com/audio1.mp3',
+        duration: 30000,
+        lrcJson: JSON.stringify([{ section_type: 'verse', start: 0, end: 30000, lines: [] }]),
       });
 
       await battleDB.createVerse({
@@ -126,24 +129,23 @@ describe('tRPC Battle API', () => {
         orderIdx: 1,
         ai: 'RhymeAI',
         lyrics: 'Response from RhymeAI',
-        audioUrl: 'https://example.com/audio.mp3',
-        lrcJson: JSON.stringify({ timestamps: [{ time: 0, text: 'Response from RhymeAI' }] }),
+        audioUrl: 'https://example.com/audio2.mp3',
+        duration: 25000,
+        lrcJson: JSON.stringify([{ section_type: 'verse', start: 0, end: 25000, lines: [] }]),
       });
 
       const battle = await caller.battles.get({ battle_id: battleId });
       
       expect(battle.verses).toHaveLength(2);
-      expect(battle.verses[0]?.order_idx).toBe(0);
+      expect(battle.verses[0]?.url).toBe('https://example.com/audio1.mp3');
       expect(battle.verses[0]?.ai).toBe('TestBot');
-      expect(battle.verses[0]?.lyrics).toBe('First verse from TestBot');
-      expect(battle.verses[0]?.audio_url).toBeNull();
-      expect(battle.verses[0]?.lrc_json).toBeNull();
+      expect(battle.verses[0]?.duration).toBe(30000);
+      expect(battle.verses[0]?.lyrics_sections).toEqual([{ section_type: 'verse', start: 0, end: 30000, lines: [] }]);
 
-      expect(battle.verses[1]?.order_idx).toBe(1);
+      expect(battle.verses[1]?.url).toBe('https://example.com/audio2.mp3');
       expect(battle.verses[1]?.ai).toBe('RhymeAI');
-      expect(battle.verses[1]?.lyrics).toBe('Response from RhymeAI');
-      expect(battle.verses[1]?.audio_url).toBe('https://example.com/audio.mp3');
-      expect(battle.verses[1]?.lrc_json).toEqual({ timestamps: [{ time: 0, text: 'Response from RhymeAI' }] });
+      expect(battle.verses[1]?.duration).toBe(25000);
+      expect(battle.verses[1]?.lyrics_sections).toEqual([{ section_type: 'verse', start: 0, end: 25000, lines: [] }]);
     });
 
     it('should return error for non-existent battle', async () => {

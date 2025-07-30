@@ -213,10 +213,12 @@ class JobQueue {
     }
 
     const audioUrl = finalStatus.choices?.[0]?.url;
+    const duration = finalStatus.choices?.[0]?.duration;
     const lyricsData = finalStatus.choices?.[0]?.lyrics_sections;
 
     await battleDB.updateVerse(verseId, {
       audioUrl,
+      duration,
       lrcJson: lyricsData ? JSON.stringify(lyricsData) : undefined,
       murekaStatus: finalStatus.status
     });

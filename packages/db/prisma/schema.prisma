@@ -34,6 +34,7 @@ model Verse {
   ai            String   // which AI rapper this verse belongs to
   lyrics        String
   audioUrl      String?  // nullable until audio is generated
+  duration      Int?     // audio duration in milliseconds
   lrcJson       String?  // timestamped lyrics as JSON string
   murekaJobId   String?  // Mureka job ID for tracking audio generation
   murekaStatus  String?  // Mureka job status: preparing, queued, running, succeeded, failed, etc.

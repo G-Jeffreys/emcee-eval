@@ -33,6 +33,7 @@ export declare const insertVerseSchema: z.ZodObject<{
     ai: z.ZodString;
     lyrics: z.ZodString;
     audioUrl: z.ZodOptional<z.ZodString>;
+    duration: z.ZodOptional<z.ZodNumber>;
     lrcJson: z.ZodOptional<z.ZodString>;
     murekaJobId: z.ZodOptional<z.ZodString>;
     murekaStatus: z.ZodOptional<z.ZodString>;
@@ -42,6 +43,7 @@ export declare const insertVerseSchema: z.ZodObject<{
     ai: string;
     lyrics: string;
     audioUrl?: string | undefined;
+    duration?: number | undefined;
     lrcJson?: string | undefined;
     murekaJobId?: string | undefined;
     murekaStatus?: string | undefined;
@@ -51,6 +53,7 @@ export declare const insertVerseSchema: z.ZodObject<{
     ai: string;
     lyrics: string;
     audioUrl?: string | undefined;
+    duration?: number | undefined;
     lrcJson?: string | undefined;
     murekaJobId?: string | undefined;
     murekaStatus?: string | undefined;
@@ -58,18 +61,21 @@ export declare const insertVerseSchema: z.ZodObject<{
 export declare const updateVerseSchema: z.ZodObject<{
     lyrics: z.ZodOptional<z.ZodString>;
     audioUrl: z.ZodOptional<z.ZodString>;
+    duration: z.ZodOptional<z.ZodNumber>;
     lrcJson: z.ZodOptional<z.ZodString>;
     murekaJobId: z.ZodOptional<z.ZodString>;
     murekaStatus: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     lyrics?: string | undefined;
     audioUrl?: string | undefined;
+    duration?: number | undefined;
     lrcJson?: string | undefined;
     murekaJobId?: string | undefined;
     murekaStatus?: string | undefined;
 }, {
     lyrics?: string | undefined;
     audioUrl?: string | undefined;
+    duration?: number | undefined;
     lrcJson?: string | undefined;
     murekaJobId?: string | undefined;
     murekaStatus?: string | undefined;
@@ -122,6 +128,7 @@ export declare const battleDB: {
         ai: string;
         lyrics: string;
         audioUrl: string | null;
+        duration: number | null;
         lrcJson: string | null;
         murekaJobId: string | null;
         murekaStatus: string | null;
@@ -134,6 +141,7 @@ export declare const battleDB: {
         ai: string;
         lyrics: string;
         audioUrl: string | null;
+        duration: number | null;
         lrcJson: string | null;
         murekaJobId: string | null;
         murekaStatus: string | null;
@@ -146,6 +154,7 @@ export declare const battleDB: {
         ai: string;
         lyrics: string;
         audioUrl: string | null;
+        duration: number | null;
         lrcJson: string | null;
         murekaJobId: string | null;
         murekaStatus: string | null;
@@ -159,6 +168,7 @@ export declare const battleDB: {
             ai: string;
             lyrics: string;
             audioUrl: string | null;
+            duration: number | null;
             lrcJson: string | null;
             murekaJobId: string | null;
             murekaStatus: string | null;
@@ -204,6 +214,7 @@ export declare const battleDB: {
         ai: string;
         lyrics: string;
         audioUrl: string | null;
+        duration: number | null;
         lrcJson: string | null;
         murekaJobId: string | null;
         murekaStatus: string | null;

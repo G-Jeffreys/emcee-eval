@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { beforeAll } from 'vitest';
 // Use an in-memory database for tests
 process.env.DATABASE_URL = `file:memdb-${randomUUID()}?mode=memory&cache=shared`;
 beforeAll(async () => {

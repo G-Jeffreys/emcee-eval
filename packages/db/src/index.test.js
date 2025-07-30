@@ -135,10 +135,10 @@ describe('BattleDB', () => {
             await battleDB.createVerse(verse2Data);
             const verses = await battleDB.getVersesByBattle(battleId);
             expect(verses).toHaveLength(2);
-            expect(verses[0].orderIdx).toBe(0);
-            expect(verses[0].ai).toBe('RapBot');
-            expect(verses[1].orderIdx).toBe(1);
-            expect(verses[1].ai).toBe('LyricMaster');
+            expect(verses[0]?.orderIdx).toBe(0);
+            expect(verses[0]?.ai).toBe('RapBot');
+            expect(verses[1]?.orderIdx).toBe(1);
+            expect(verses[1]?.ai).toBe('LyricMaster');
         });
         it('should update verse with audio URL', async () => {
             const verse = await battleDB.createVerse({
@@ -172,8 +172,8 @@ describe('BattleDB', () => {
             expect(battleWithVerses).toBeDefined();
             expect(battleWithVerses?.id).toBe(battleId);
             expect(battleWithVerses?.verses).toHaveLength(2);
-            expect(battleWithVerses?.verses[0].lyrics).toBe('First verse');
-            expect(battleWithVerses?.verses[1].lyrics).toBe('Second verse');
+            expect(battleWithVerses?.verses[0]?.lyrics).toBe('First verse');
+            expect(battleWithVerses?.verses[1]?.lyrics).toBe('Second verse');
         });
     });
     describe('Data validation', () => {
